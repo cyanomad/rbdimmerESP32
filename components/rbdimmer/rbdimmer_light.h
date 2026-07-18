@@ -19,7 +19,6 @@ class RBDimmerLight : public light::LightOutput, public Component {
   void set_hub(RBDimmerHub *hub) { this->hub_ = hub; }
   void set_pin(uint8_t pin) { this->pin_ = pin; }
   void set_phase(uint8_t phase) { this->phase_ = phase; }
-  void set_curve(uint8_t curve) { this->curve_ = static_cast<rbdimmer_curve_t>(curve); }
 
   void setup() override {
     if (this->hub_ == nullptr || !this->hub_->is_initialized()) {
@@ -32,7 +31,6 @@ class RBDimmerLight : public light::LightOutput, public Component {
         .gpio_pin = this->pin_,
         .phase = this->phase_,
         .initial_level = 0,
-        .curve_type = this->curve_,
     };
 
     rbdimmer_err_t err = rbdimmer_create_channel(&config, &this->channel_);
@@ -42,8 +40,7 @@ class RBDimmerLight : public light::LightOutput, public Component {
       return;
     }
 
-    ESP_LOGI(TAG_LIGHT, "Channel created: pin=%d, phase=%d, curve=%d",
-             this->pin_, this->phase_, this->curve_);
+    ESP_LOGI(TAG_LIGHT, "Channel created: pin=%d, phase=%d", this->pin_, this->phase_);
   }
 
   light::LightTraits get_traits() override {
@@ -59,8 +56,8 @@ class RBDimmerLight : public light::LightOutput, public Component {
     float brightness;
     state->current_values_as_brightness(&brightness);
 
-    // Library uses integer 0-100 range; use round() to avoid float truncation
-    // (e.g. 1.0f * 100.0f = 99.9999... would truncate to 99 without rounding)
+    // Library range is 0-10000 (conduction time in microseconds at 50 Hz,
+    // half-cycle = ~10000us); use round() to avoid float truncation.
     uint16_t level = static_cast<uint16_t>(roundf(brightness * 10000.0f));
     if (level > 10000) level = 10000;
     rbdimmer_set_level(this->channel_, level);
@@ -70,25 +67,16 @@ class RBDimmerLight : public light::LightOutput, public Component {
     ESP_LOGCONFIG(TAG_LIGHT, "RBDimmer Light:");
     ESP_LOGCONFIG(TAG_LIGHT, "  Pin: %d", this->pin_);
     ESP_LOGCONFIG(TAG_LIGHT, "  Phase: %d", this->phase_);
-    ESP_LOGCONFIG(TAG_LIGHT, "  Curve: %d", this->curve_);
   }
 
   float get_setup_priority() const override { return setup_priority::HARDWARE - 1.0f; }
 
   rbdimmer_channel_t *get_channel() { return this->channel_; }
 
-  void set_curve_runtime(rbdimmer_curve_t curve) {
-    if (this->channel_ != nullptr) {
-      rbdimmer_set_curve(this->channel_, curve);
-      this->curve_ = curve;
-    }
-  }
-
  protected:
   RBDimmerHub *hub_{nullptr};
   uint8_t pin_{0};
   uint8_t phase_{0};
-  rbdimmer_curve_t curve_{RBDIMMER_CURVE_RMS};
   rbdimmer_channel_t *channel_{nullptr};
 };
 
