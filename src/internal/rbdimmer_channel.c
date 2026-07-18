@@ -162,9 +162,9 @@ rbdimmer_err_t rbdimmer_create_channel(rbdimmer_config_t* config,
 
     new_channel->gpio_pin          = config->gpio_pin;
     new_channel->phase             = config->phase;
-    new_channel->level_percent     = config->initial_level > 100 ? 100
+    new_channel->level_percent     = config->initial_level > 9800 ? 9800
                                                                   : config->initial_level;
-    new_channel->prev_level_percent = 255; // force update on first run
+    new_channel->prev_level_percent = 10000; // force update on first run
     new_channel->curve_type        = config->curve_type;
     new_channel->is_active         = true;
     new_channel->needs_update      = true;
@@ -172,8 +172,7 @@ rbdimmer_err_t rbdimmer_create_channel(rbdimmer_config_t* config,
     new_channel->transition_task   = NULL;
     new_channel->current_delay     = rbdimmer_curves_level_to_delay(
         new_channel->level_percent,
-        zc->half_cycle_us,
-        new_channel->curve_type
+        zc->half_cycle_us
     );
 
     ESP_LOGI(TAG, "Initial delay: %"PRIu32" us, half-cycle: %"PRIu32" us",
@@ -250,12 +249,12 @@ rbdimmer_err_t rbdimmer_delete_channel(rbdimmer_channel_t* channel) {
 // ---------------------------------------------------------------------------
 
 rbdimmer_err_t rbdimmer_set_level(rbdimmer_channel_t* channel,
-                                   uint8_t level_percent) {
+                                   uint16_t level_percent) {
     if (channel == NULL) {
         return RBDIMMER_ERR_INVALID_ARG;
     }
-    if (level_percent > 100) {
-        level_percent = 100;
+    if (level_percent > 9800) {
+        level_percent = 9800;
     }
     if (channel->level_percent != level_percent) {
         channel->prev_level_percent = channel->level_percent;
@@ -315,7 +314,7 @@ rbdimmer_err_t rbdimmer_update_all(void) {
 // Public API — getters
 // ---------------------------------------------------------------------------
 
-uint8_t rbdimmer_get_level(rbdimmer_channel_t* channel) {
+uint16_t rbdimmer_get_level(rbdimmer_channel_t* channel) {
     if (channel == NULL) return 0;
     return channel->level_percent;
 }
@@ -349,8 +348,7 @@ static void update_channel_delay(rbdimmer_channel_t* channel) {
     }
     uint32_t new_delay = rbdimmer_curves_level_to_delay(
         channel->level_percent,
-        zc->half_cycle_us,
-        channel->curve_type
+        zc->half_cycle_us
     );
     if (new_delay != channel->current_delay) {
         channel->current_delay = new_delay;
