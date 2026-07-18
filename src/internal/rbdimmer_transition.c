@@ -55,20 +55,35 @@ static void level_transition_task(void* pvParameters) {
     uint16_t  current   = params->start_level;
     uint16_t  target    = params->target_level;
     int16_t   step      = (target > current) ? 100 : -100;
-    uint16_t steps     = (uint16_t)abs((int)target - (int)current);
-    uint32_t step_time = (steps > 0) ? (params->transition_ms / steps)
-                                      : params->transition_ms;
+    uint16_t  diff       = (uint16_t)abs((int)target - (int)current);
+    // Number of loop iterations at the actual ±100-unit step size (NOT the
+    // raw level difference - that would make step_time below come out
+    // ~100x too small, which the step_ms floor then masks by silently
+    // ignoring the requested transition_ms for most realistic durations).
+    uint16_t steps     = (diff + 99) / 100;
+    if (steps == 0) steps = 1;
+    uint32_t step_time = params->transition_ms / steps;
     if (step_time < params->step_ms) {
         step_time = params->step_ms;
     }
 
     while (current != target) {
         rbdimmer_set_level(ch, current);
-        current += step;
-        if ((step > 0 && current > target) ||
-            (step < 0 && current < target)) {
+
+        // Compute the next value in a wide signed type first - current is
+        // uint16_t, and current + step can go negative on the final partial
+        // step of a downward transition (whenever the remaining distance is
+        // less than the 100-unit step). Adding directly into a uint16_t
+        // wraps to a huge value instead, which the overshoot check below
+        // can't detect (65516 is not "less than" a small target).
+        int32_t next = (int32_t)current + step;
+        if ((step > 0 && next >= (int32_t)target) ||
+            (step < 0 && next <= (int32_t)target)) {
             current = target;
+        } else {
+            current = (uint16_t)next;
         }
+
         vTaskDelay(pdMS_TO_TICKS(step_time));
     }
     rbdimmer_set_level(ch, target);
