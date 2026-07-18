@@ -58,22 +58,13 @@ void rbdimmer_curves_init(void) {
     }
 }
 
-uint32_t rbdimmer_curves_level_to_delay(uint8_t level_percent,
-                                         uint32_t half_cycle_us,
-                                         rbdimmer_curve_t curve_type) {
+uint32_t rbdimmer_curves_level_to_delay(uint16_t level_percent,
+                                         uint32_t half_cycle_us) {
     // Configurable via Kconfig; Arduino fallback values match tested defaults.
-#ifdef CONFIG_RBDIMMER_LEVEL_MAX
-#  define LEVEL_MAX_PCT  CONFIG_RBDIMMER_LEVEL_MAX
-#else
-#  define LEVEL_MAX_PCT  99
-#endif
-#ifdef CONFIG_RBDIMMER_LEVEL_MIN
-#  define LEVEL_MIN_PCT  CONFIG_RBDIMMER_LEVEL_MIN
-#else
-#  define LEVEL_MIN_PCT  3
-#endif
+#define LEVEL_MAX_PCT  9800
+#define LEVEL_MIN_PCT  300
 
-    if (level_percent >= 100) {
+    if (level_percent >= 9800) {
         level_percent = LEVEL_MAX_PCT;  // map 100% → max delay (~100 us @ 50 Hz)
     }
     if (level_percent < LEVEL_MIN_PCT) {
@@ -81,22 +72,9 @@ uint32_t rbdimmer_curves_level_to_delay(uint8_t level_percent,
         return 0;
     }
 
-    uint8_t delay_percent;
-    switch (curve_type) {
-        case RBDIMMER_CURVE_RMS:
-            delay_percent = table_rms[level_percent];
-            break;
-        case RBDIMMER_CURVE_LOGARITHMIC:
-            delay_percent = table_log[level_percent];
-            break;
-        case RBDIMMER_CURVE_LINEAR:
-        case RBDIMMER_CURVE_CUSTOM:  // not yet implemented — falls back to LINEAR
-        default:
-            delay_percent = table_linear[level_percent];
-            break;
-    }
-
-    uint32_t delay_us = (half_cycle_us * delay_percent) / 100;
+    //uint32_t delay_percent = level_percent;
+    //uint32_t delay_us = (half_cycle_us * delay_percent) / 100;
+    uint32_t delay_us = half_cycle_us - level_percent;
 
     if (delay_us < RBDIMMER_MIN_DELAY_US) {
         delay_us = RBDIMMER_MIN_DELAY_US;
