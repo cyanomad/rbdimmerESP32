@@ -13,7 +13,7 @@
  * All channel lifecycle and control functions live in rbdimmer_channel.c.
  * Zero-cross detection lives in rbdimmer_zerocross.c.
  * Timer state machine lives in rbdimmer_timer.c.
- * Brightness curves live in rbdimmer_curves.c.
+ * Level-to-delay conversion lives in rbdimmer_curves.c.
  *
  * @author dev@rbdimmer.com
  * @version 1.0.0
