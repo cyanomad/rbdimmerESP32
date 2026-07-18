@@ -5,7 +5,7 @@
  *
  * Owns dimmer_manager and on_zero_cross_phase (ISR phase-trigger).
  * Implements all public channel API declared in rbdimmerESP32.h:
- *   create/delete, set_level, set_active, set_curve, getters, update_all.
+ *   create/delete, set_level, set_active, getters, update_all.
  */
 
 #include "rbdimmer_channel.h"
@@ -165,7 +165,6 @@ rbdimmer_err_t rbdimmer_create_channel(rbdimmer_config_t* config,
     new_channel->level_percent     = config->initial_level > 9800 ? 9800
                                                                   : config->initial_level;
     new_channel->prev_level_percent = 10000; // force update on first run
-    new_channel->curve_type        = config->curve_type;
     new_channel->is_active         = true;
     new_channel->needs_update      = true;
     new_channel->timer_state       = TIMER_STATE_IDLE;
@@ -267,22 +266,6 @@ rbdimmer_err_t rbdimmer_set_level(rbdimmer_channel_t* channel,
     return RBDIMMER_OK;
 }
 
-rbdimmer_err_t rbdimmer_set_curve(rbdimmer_channel_t* channel,
-                                   rbdimmer_curve_t curve_type) {
-    if (channel == NULL) {
-        return RBDIMMER_ERR_INVALID_ARG;
-    }
-    if (curve_type != channel->curve_type) {
-        channel->curve_type   = curve_type;
-        channel->needs_update = true;
-        ESP_LOGI(TAG, "Setting curve type to %d", curve_type);
-        if (channel->is_active) {
-            update_channel_delay(channel);
-        }
-    }
-    return RBDIMMER_OK;
-}
-
 rbdimmer_err_t rbdimmer_set_active(rbdimmer_channel_t* channel, bool active) {
     if (channel == NULL) {
         return RBDIMMER_ERR_INVALID_ARG;
@@ -322,11 +305,6 @@ uint16_t rbdimmer_get_level(rbdimmer_channel_t* channel) {
 bool rbdimmer_is_active(rbdimmer_channel_t* channel) {
     if (channel == NULL) return false;
     return channel->is_active;
-}
-
-rbdimmer_curve_t rbdimmer_get_curve(rbdimmer_channel_t* channel) {
-    if (channel == NULL) return RBDIMMER_CURVE_LINEAR;
-    return channel->curve_type;
 }
 
 uint32_t rbdimmer_get_delay(rbdimmer_channel_t* channel) {
