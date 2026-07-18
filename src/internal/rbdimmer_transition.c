@@ -54,7 +54,7 @@ static void level_transition_task(void* pvParameters) {
 
     uint16_t  current   = params->start_level;
     uint16_t  target    = params->target_level;
-    int16_t   step      = (target > current) ? 1 : -1;
+    int16_t   step      = (target > current) ? 100 : -100;
     uint16_t steps     = (uint16_t)abs((int)target - (int)current);
     uint32_t step_time = (steps > 0) ? (params->transition_ms / steps)
                                       : params->transition_ms;
