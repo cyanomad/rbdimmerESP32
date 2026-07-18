@@ -37,7 +37,6 @@
 rbdimmer_err_t rbdimmer_init(void) {
     rbdimmer_zc_init();
     rbdimmer_channel_manager_init();   // also registers ZC phase-trigger
-    rbdimmer_curves_init();
     ESP_LOGI(TAG, "RBDimmer library initialized");
     return RBDIMMER_OK;
 }
