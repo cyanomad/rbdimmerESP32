@@ -15,7 +15,7 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"   // TaskHandle_t
 #include "freertos/task.h"
-#include "rbdimmerESP32.h"       // rbdimmer_curve_t, rbdimmer_channel_t (opaque forward decl)
+#include "rbdimmerESP32.h"       // rbdimmer_channel_t (opaque forward decl)
 
 #ifdef __cplusplus
 extern "C" {
