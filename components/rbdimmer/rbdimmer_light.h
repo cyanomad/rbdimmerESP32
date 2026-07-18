@@ -61,7 +61,7 @@ class RBDimmerLight : public light::LightOutput, public Component {
 
     // Library uses integer 0-100 range; use round() to avoid float truncation
     // (e.g. 1.0f * 100.0f = 99.9999... would truncate to 99 without rounding)
-    uint16_t level = static_cast<uint16_t>(roundf(brightness * 100.0f));
+    uint16_t level = static_cast<uint16_t>(roundf(brightness * 10000.0f));
     if (level > 10000) level = 10000;
     rbdimmer_set_level(this->channel_, level);
   }
