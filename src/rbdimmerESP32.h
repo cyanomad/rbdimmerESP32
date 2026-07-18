@@ -68,14 +68,6 @@
  #define RBDIMMER_FREQUENCY_MAX 65             // Maximum allowed frequency
  #define RBDIMMER_MEASURE_CYCLES 10            // Number of cycles for frequency measurement
  
- // Enumerations
- typedef enum {
-     RBDIMMER_CURVE_LINEAR,                    // Linear curve (no RMS consideration)
-     RBDIMMER_CURVE_RMS,                       // RMS-compensated curve
-     RBDIMMER_CURVE_LOGARITHMIC,               // Logarithmic curve (for LEDs)
-     RBDIMMER_CURVE_CUSTOM                     // Custom curve
- } rbdimmer_curve_t;
- 
  typedef enum {
      RBDIMMER_EDGE_FALLING,                    // Falling edge
      RBDIMMER_EDGE_RISING                      // Rising edge
@@ -99,7 +91,6 @@
      uint8_t gpio_pin;                 // Output signal pin
      uint8_t phase;                    // Phase number (for multi-phase systems)
      uint16_t initial_level;            // Initial level percentage (0-100)
-     rbdimmer_curve_t curve_type;      // Level curve type
  } rbdimmer_config_t;
  
  /**
@@ -148,15 +139,6 @@
   * @return RBDIMMER_OK if successful, otherwise an error code
   */
  rbdimmer_err_t rbdimmer_set_level_transition(rbdimmer_channel_t* channel, uint16_t level_percent, uint32_t transition_ms);
- 
- /**
-  * @brief Set level curve type
-  * 
-  * @param channel Channel handle
-  * @param curve_type Curve type (linear, RMS, logarithmic, or custom)
-  * @return RBDIMMER_OK if successful, otherwise an error code
-  */
- rbdimmer_err_t rbdimmer_set_curve(rbdimmer_channel_t* channel, rbdimmer_curve_t curve_type);
  
  /**
   * @brief Enable or disable a channel
@@ -222,14 +204,6 @@
   * @return true if active, false otherwise
   */
  bool rbdimmer_is_active(rbdimmer_channel_t* channel);
- 
- /**
-  * @brief Get the curve type of a channel
-  * 
-  * @param channel Channel handle
-  * @return Current curve type
-  */
- rbdimmer_curve_t rbdimmer_get_curve(rbdimmer_channel_t* channel);
  
  /**
   * @brief Get the current delay setting of a channel
