@@ -38,8 +38,8 @@
 
 typedef struct {
     rbdimmer_channel_t* channel;
-    uint8_t  start_level;
-    uint8_t  target_level;
+    uint16_t  start_level;
+    uint16_t  target_level;
     uint32_t transition_ms;
     uint32_t step_ms;
 } transition_params_t;
@@ -52,10 +52,10 @@ static void level_transition_task(void* pvParameters) {
     transition_params_t* params = (transition_params_t*)pvParameters;
     rbdimmer_channel_t*  ch     = params->channel;
 
-    uint8_t  current   = params->start_level;
-    uint8_t  target    = params->target_level;
-    int8_t   step      = (target > current) ? 1 : -1;
-    uint32_t steps     = (uint32_t)abs((int)target - (int)current);
+    uint16_t  current   = params->start_level;
+    uint16_t  target    = params->target_level;
+    int16_t   step      = (target > current) ? 1 : -1;
+    uint16_t steps     = (uint16_t)abs((int)target - (int)current);
     uint32_t step_time = (steps > 0) ? (params->transition_ms / steps)
                                       : params->transition_ms;
     if (step_time < params->step_ms) {
@@ -84,13 +84,13 @@ static void level_transition_task(void* pvParameters) {
 // ---------------------------------------------------------------------------
 
 rbdimmer_err_t rbdimmer_set_level_transition(rbdimmer_channel_t* channel,
-                                               uint8_t level_percent,
+                                               uint16_t level_percent,
                                                uint32_t transition_ms) {
     if (channel == NULL) {
         return RBDIMMER_ERR_INVALID_ARG;
     }
-    if (level_percent > 100) {
-        level_percent = 100;
+    if (level_percent > 9800) {
+        level_percent = 9800;
     }
     if (channel->level_percent == level_percent) {
         return RBDIMMER_OK;
