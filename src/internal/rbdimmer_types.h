@@ -61,8 +61,8 @@ struct rbdimmer_channel_s {
 
     // Fields shared between task and ISR context — must be volatile so the
     // compiler does not cache them in a register across context boundaries.
-    volatile uint8_t  level_percent;           // Current brightness (0-100)
-    uint8_t prev_level_percent;                // Previous brightness (change detection, task-only)
+    volatile uint16_t  level_percent;           // Current brightness (0-100)
+    uint16_t prev_level_percent;                // Previous brightness (change detection, task-only)
     volatile uint32_t current_delay;           // Firing delay [µs]: written by task, read by ISR
     volatile bool     is_active;               // Enable flag: written by task, read by ISR
     bool needs_update;                         // Delay recalc pending (task-only)
