@@ -90,7 +90,7 @@
  typedef struct {
      uint8_t gpio_pin;                 // Output signal pin
      uint8_t phase;                    // Phase number (for multi-phase systems)
-     uint16_t initial_level;            // Initial level percentage (0-100)
+     uint16_t initial_level;            // Initial conduction time, 0-10000 us (50 Hz half-cycle)
  } rbdimmer_config_t;
  
  /**
@@ -125,7 +125,7 @@
   * @brief Set channel level
   * 
   * @param channel Channel handle
-  * @param level_percent Level percentage (0-100)
+  * @param level_percent Desired conduction time, 0-10000 us (50 Hz half-cycle)
   * @return RBDIMMER_OK if successful, otherwise an error code
   */
  rbdimmer_err_t rbdimmer_set_level(rbdimmer_channel_t* channel, uint16_t level_percent);
@@ -134,7 +134,7 @@
   * @brief Set channel level with smooth transition
   * 
   * @param channel Channel handle
-  * @param level_percent Target level percentage (0-100)
+  * @param level_percent Target conduction time, 0-10000 us
   * @param transition_ms Transition time in milliseconds
   * @return RBDIMMER_OK if successful, otherwise an error code
   */
@@ -153,7 +153,7 @@
   * @brief Get current channel level
   * 
   * @param channel Channel handle
-  * @return Current level percentage (0-100)
+  * @return Current conduction time, 0-10000 us
   */
  uint16_t rbdimmer_get_level(rbdimmer_channel_t* channel);
  
