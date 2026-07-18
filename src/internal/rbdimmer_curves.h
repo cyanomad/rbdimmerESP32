@@ -32,9 +32,8 @@ void rbdimmer_curves_init(void);
  * @param curve_type     Selected brightness curve
  * @return               Delay in microseconds (clamped to safe range)
  */
-uint32_t rbdimmer_curves_level_to_delay(uint8_t level_percent,
-                                         uint32_t half_cycle_us,
-                                         rbdimmer_curve_t curve_type);
+uint32_t rbdimmer_curves_level_to_delay(uint16_t level_percent,
+                                         uint32_t half_cycle_us);
 
 #ifdef __cplusplus
 }
