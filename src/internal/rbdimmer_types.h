@@ -66,7 +66,6 @@ struct rbdimmer_channel_s {
     volatile uint32_t current_delay;           // Firing delay [µs]: written by task, read by ISR
     volatile bool     is_active;               // Enable flag: written by task, read by ISR
     bool needs_update;                         // Delay recalc pending (task-only)
-    rbdimmer_curve_t curve_type;               // Brightness curve (task-only)
     esp_timer_handle_t delay_timer;            // One-shot: zero-cross → TRIAC fire
     esp_timer_handle_t pulse_timer;            // One-shot: TRIAC fire → pulse end
     volatile timer_state_t timer_state;        // FSM state: read/written by ISR callbacks
