@@ -98,7 +98,7 @@
  typedef struct {
      uint8_t gpio_pin;                 // Output signal pin
      uint8_t phase;                    // Phase number (for multi-phase systems)
-     uint8_t initial_level;            // Initial level percentage (0-100)
+     uint16_t initial_level;            // Initial level percentage (0-100)
      rbdimmer_curve_t curve_type;      // Level curve type
  } rbdimmer_config_t;
  
@@ -137,7 +137,7 @@
   * @param level_percent Level percentage (0-100)
   * @return RBDIMMER_OK if successful, otherwise an error code
   */
- rbdimmer_err_t rbdimmer_set_level(rbdimmer_channel_t* channel, uint8_t level_percent);
+ rbdimmer_err_t rbdimmer_set_level(rbdimmer_channel_t* channel, uint16_t level_percent);
  
  /**
   * @brief Set channel level with smooth transition
@@ -147,7 +147,7 @@
   * @param transition_ms Transition time in milliseconds
   * @return RBDIMMER_OK if successful, otherwise an error code
   */
- rbdimmer_err_t rbdimmer_set_level_transition(rbdimmer_channel_t* channel, uint8_t level_percent, uint32_t transition_ms);
+ rbdimmer_err_t rbdimmer_set_level_transition(rbdimmer_channel_t* channel, uint16_t level_percent, uint32_t transition_ms);
  
  /**
   * @brief Set level curve type
@@ -173,7 +173,7 @@
   * @param channel Channel handle
   * @return Current level percentage (0-100)
   */
- uint8_t rbdimmer_get_level(rbdimmer_channel_t* channel);
+ uint16_t rbdimmer_get_level(rbdimmer_channel_t* channel);
  
  /**
   * @brief Get measured mains frequency for specified phase
